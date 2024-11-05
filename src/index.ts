@@ -14,8 +14,14 @@ import { AdvancedLLM } from './llm/AdvancedLLM';
     console.log(llm.generate('Tell me something interesting', userId));
 
     // Multi-modal Crawling and Learning
-    await llm.crawlAndLearn('https://example.com');
-    console.log(llm.generate('Summarize the learned data', userId));
+    try {
+        await llm.crawlAndLearn('https://example.com');
+    } catch (error) {
+        console.error("Caught an error during crawling and learning:", error);
+    }
+
+    // Advanced error detection and self-optimization
+    llm.selfOptimize();
 
     // Output for verification
     console.log(llm.generate('What are key takeaways from this session?', userId));
