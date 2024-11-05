@@ -8,6 +8,7 @@ import { ErrorDetector } from '../utils/errorDetection';
 import { FeedbackManager, Feedback } from '../utils/feedbackManager';
 import { KnowledgeTransferManager, ExternalKnowledge } from '../utils/knowledgeTransferManager';
 import { BiasChecker, BiasCheckResult } from '../utils/biasChecker';
+import { ApiManager } from '../utils/apiManager';
 
 export class AdvancedLLM extends BasicLLM {
     private optimizationHistory: string[] = [];
@@ -16,6 +17,7 @@ export class AdvancedLLM extends BasicLLM {
     private feedbackManager: FeedbackManager;
     private knowledgeTransferManager: KnowledgeTransferManager;
     private biasChecker: BiasChecker;
+    private apiManager: ApiManager;
 
     constructor() {
         super();
@@ -24,6 +26,7 @@ export class AdvancedLLM extends BasicLLM {
         this.feedbackManager = new FeedbackManager();
         this.knowledgeTransferManager = new KnowledgeTransferManager();
         this.biasChecker = new BiasChecker();
+        this.apiManager = new ApiManager();
     }
 
     async crawlAndLearn(startUrl: string): Promise<void> {
@@ -58,10 +61,7 @@ export class AdvancedLLM extends BasicLLM {
 
     // Adaptive Learning: Generate a response based on user preferences
     generate(prompt: string): string {
-        return this.generateWithUser(prompt, "defaultUserId");
-    }
-
-    generateWithUser(prompt: string, userId: string): string {
+        const userId = "defaultUserId"; // or fetch the userId from a context or a default value
         try {
             const userProfile = this.userProfileManager.getUserProfile(userId);
 
@@ -98,8 +98,8 @@ Warning: This response may contain biased language. Detected issues: ${biasCheck
     // Update user preferences based on interaction or explicit feedback
     updateUserPreferences(userId: string, preferences: Partial<UserProfile["preferences"]>): void {
         try {
-            const currentPreferences = this.userProfileManager.getUserProfile(userId).preferences;
-            const updatedPreferences = { ...currentPreferences, ...preferences };
+            const currentUserProfile = this.userProfileManager.getUserProfile(userId);
+            const updatedPreferences = { ...currentUserProfile.preferences, ...preferences };
             this.userProfileManager.updateUserProfile(userId, { preferences: updatedPreferences });
         } catch (error) {
             if (error instanceof Error) {
@@ -132,6 +132,27 @@ Warning: This response may contain biased language. Detected issues: ${biasCheck
                 this.errorDetector.logError(`Error during knowledge transfer: ${error.message}`);
             } else {
                 this.errorDetector.logError(`Error during knowledge transfer: ${error}`);
+            }
+        }
+    }
+
+    // Fetch external data from APIs and learn from it
+    async fetchDataAndLearn(city: string, topic: string): Promise<void> {
+        try {
+            const weatherData = await this.apiManager.getWeatherData(city);
+            const newsData = await this.apiManager.getNewsData(topic);
+
+            // Use fetched data to train the model
+            this.train(`Weather data: ${JSON.stringify(weatherData.data)}`);
+            newsData.data.forEach((article: any) => this.train(`News article: ${article.title} - ${article.description}`));
+
+            this.optimizationHistory.push(`Fetched external data (Weather and News) and learned from it at ${new Date().toISOString()}`);
+            this.saveKnowledge();
+        } catch (error) {
+            if (error instanceof Error) {
+                this.errorDetector.logError(`Error during fetching and learning from external APIs: ${error.message}`);
+            } else {
+                this.errorDetector.logError(`Error during fetching and learning from external APIs: ${error}`);
             }
         }
     }

@@ -32,6 +32,9 @@ import { AdvancedLLM } from './llm/AdvancedLLM';
     };
     llm.transferKnowledge(externalKnowledge);
 
+    // Fetch external data from APIs and learn from it
+    await llm.fetchDataAndLearn('Hamburg', 'technology');
+
     // Advanced error detection and self-optimization
     llm.selfOptimize();
 
