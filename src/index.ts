@@ -3,13 +3,20 @@ import { AdvancedLLM } from './llm/AdvancedLLM';
 
 (async () => {
     const llm = new AdvancedLLM();
+    const userId = "user123";
+
+    // Initial training and interaction
     llm.train('Initial training data');
-    console.log(llm.generate('What is the meaning of life?'));
+    console.log(llm.generate('What is the meaning of life?', userId));
+
+    // Update user preferences to be more casual
+    llm.updateUserPreferences(userId, { preferredTone: 'casual' });
+    console.log(llm.generate('Tell me something interesting', userId));
 
     // Multi-modal Crawling and Learning
     await llm.crawlAndLearn('https://example.com');
-    console.log(llm.generate('Summarize the learned data'));
+    console.log(llm.generate('Summarize the learned data', userId));
 
     // Output for verification
-    console.log(llm.generate('What are key takeaways from this session?'));
+    console.log(llm.generate('What are key takeaways from this session?', userId));
 })();
