@@ -20,7 +20,7 @@ export class UserProfileManager {
       this.profiles.set(userId, {
         id: userId,
         preferences: {
-          preferredTone: "neutral",
+          preferredTone: 'neutral',
           interests: [],
         },
         interactionHistory: [],
@@ -38,12 +38,12 @@ export class UserProfileManager {
       profile.interactionHistory.push(...update.interactionHistory);
     }
   }
-  
+
   getDefaultProfile(userId: string): UserProfile {
     return {
       id: userId,
       preferences: {
-        preferredTone: "neutral",
+        preferredTone: 'neutral',
         interests: [],
       },
       interactionHistory: [],

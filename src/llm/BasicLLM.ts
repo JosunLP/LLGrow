@@ -1,14 +1,13 @@
-
-import { LLM } from "./LLM";
-import { crawlAndExplore } from "../utils/crawler";
-import { openDb, initializeDb } from "../utils/database";
+import { LLM } from './LLM';
+import { crawlAndExplore } from '../utils/crawler';
+import { openDb, initializeDb } from '../utils/database';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { Database } from 'sqlite'; // or the correct module where Database is defined
 
 export class BasicLLM implements LLM {
   private knowledgeBase: string[] = [];
-  protected dataPath: string = path.resolve(__dirname, "../../data");
+  protected dataPath: string = path.resolve(__dirname, '../../data');
   private db: Database | null = null;
 
   constructor() {
@@ -22,20 +21,20 @@ export class BasicLLM implements LLM {
 
   async train(data: string): Promise<void> {
     if (this.db) {
-      await this.db.run("INSERT INTO knowledge (data) VALUES (?)", data);
+      await this.db.run('INSERT INTO knowledge (data) VALUES (?)', data);
     }
     this.knowledgeBase.push(data);
   }
 
   generate(prompt: string): string {
     return `Response to: ${prompt} with knowledge: ${this.knowledgeBase.join(
-      ", "
+      ', ',
     )}`;
   }
 
   selfOptimize(): void {
     this.knowledgeBase = [...new Set(this.knowledgeBase)];
-    this.train("New data to improve the model");
+    this.train('New data to improve the model');
   }
 
   async crawlAndLearn(startUrl: string): Promise<void> {
@@ -49,7 +48,7 @@ export class BasicLLM implements LLM {
   }
 
   developNewFunctions(): void {
-    this.train("Developed new function to improve self-awareness");
+    this.train('Developed new function to improve self-awareness');
   }
 
   saveKnowledge(): void {
@@ -57,15 +56,15 @@ export class BasicLLM implements LLM {
       fs.mkdirSync(this.dataPath, { recursive: true });
     }
     fs.writeFileSync(
-      path.join(this.dataPath, "knowledge.json"),
-      JSON.stringify(this.knowledgeBase)
+      path.join(this.dataPath, 'knowledge.json'),
+      JSON.stringify(this.knowledgeBase),
     );
   }
 
   loadKnowledge(): void {
-    const filePath = path.join(this.dataPath, "knowledge.json");
+    const filePath = path.join(this.dataPath, 'knowledge.json');
     if (fs.existsSync(filePath)) {
-      const data = fs.readFileSync(filePath, "utf-8");
+      const data = fs.readFileSync(filePath, 'utf-8');
       this.knowledgeBase = JSON.parse(data);
     }
   }
