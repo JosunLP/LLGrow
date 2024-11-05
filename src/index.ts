@@ -13,7 +13,7 @@ import { AdvancedLLM } from './llm/AdvancedLLM';
     llm.updateUserPreferences(userId, { preferredTone: 'casual' });
     console.log(llm.generate('Tell me something interesting', userId));
 
-    // Multi-modal Crawling and Learning
+    // Multi-modal Crawling and Learning with advanced prioritization
     try {
         await llm.crawlAndLearn('https://example.com');
     } catch (error) {

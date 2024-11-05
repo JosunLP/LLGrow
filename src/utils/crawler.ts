@@ -1,61 +1,105 @@
 
 import axios from 'axios';
 import * as cheerio from 'cheerio';
-import { extractTextFromUrl } from './textProcessor';
-import { processImage } from './imageProcessor';
-import { processAudio } from './audioProcessor';
 
-export async function crawlAndExplore(startUrl: string): Promise<{ text: string[], images: string[], audio: string[] }> {
+interface CrawlResult {
+    text: string[];
+    images: string[];
+    audio: string[];
+}
+
+interface LinkData {
+    url: string;
+    score: number;
+}
+
+export async function crawlAndExplore(startUrl: string): Promise<CrawlResult> {
     const visited = new Set<string>();
+    const linkQueue: LinkData[] = [];
     const texts: string[] = [];
     const images: string[] = [];
     const audio: string[] = [];
 
-    async function explore(url: string, depth: number = 0): Promise<void> {
-        if (visited.has(url) || depth > 2) return;
-        visited.add(url);
+    // Initialize the queue with the start URL and score
+    linkQueue.push({ url: startUrl, score: 0 });
 
-        try {
-            const response = await axios.get(url);
-            const $ = cheerio.load(response.data);
+    async function explore(): Promise<void> {
+        while (linkQueue.length > 0) {
+            // Sort the queue based on score (highest score first)
+            linkQueue.sort((a, b) => b.score - a.score);
+            const currentLinkData = linkQueue.shift();
 
-            // Text extraction
-            texts.push(...extractTextFromUrl($));
-
-            // Image extraction
-            $('img').each((_, elem) => {
-                const imgSrc = $(elem).attr('src');
-                if (imgSrc && !visited.has(imgSrc)) {
-                    images.push(imgSrc);
-                }
-            });
-
-            // Audio extraction
-            $('audio, source').each((_, elem) => {
-                const audioSrc = $(elem).attr('src');
-                if (audioSrc && !visited.has(audioSrc)) {
-                    audio.push(audioSrc);
-                }
-            });
-
-            // Link extraction for crawling
-            const links = $('a[href]')
-                .map((_, link) => $(link).attr('href'))
-                .get()
-                .filter(href => href && !visited.has(href) && href.startsWith('http'));
-
-            for (const link of links) {
-                await explore(link, depth + 1);
+            if (!currentLinkData || visited.has(currentLinkData.url)) {
+                continue;
             }
-        } catch (error) {
-            if (error instanceof Error) {
-                console.error(`Error during crawling ${url}: ${error.message}`);
-            } else {
-                console.error(`Error during crawling ${url}: ${String(error)}`);
+
+            visited.add(currentLinkData.url);
+
+            try {
+                const response = await axios.get(currentLinkData.url);
+                const $ = cheerio.load(response.data);
+
+                // Text extraction
+                $('body').find('*').each((_, elem) => {
+                    if ($(elem).text().trim() !== '') {
+                        texts.push($(elem).text().trim());
+                    }
+                });
+
+                // Image extraction
+                $('img').each((_, elem) => {
+                    const imgSrc = $(elem).attr('src');
+                    if (imgSrc && !visited.has(imgSrc)) {
+                        images.push(imgSrc);
+                    }
+                });
+
+                // Audio extraction
+                $('audio, source').each((_, elem) => {
+                    const audioSrc = $(elem).attr('src');
+                    if (audioSrc && !visited.has(audioSrc)) {
+                        audio.push(audioSrc);
+                    }
+                });
+
+                // Link extraction for further crawling
+                $('a[href]').each((_, link) => {
+                    const href = $(link).attr('href');
+                    if (href && !visited.has(href) && href.startsWith('http')) {
+                        // Evaluate the link and add it to the queue with a score
+                        const score = evaluateLink(href, $(link).text());
+                        linkQueue.push({ url: href, score });
+                    }
+                });
+            } catch (error: any) {
+                console.error(`Error during crawling ${currentLinkData.url}: ${error.message}`);
             }
         }
     }
 
-    await explore(startUrl);
-    return { text: texts, images, audio };
+    // Link scoring function to prioritize links
+    function evaluateLink(url: string, anchorText: string): number {
+        let score = 0;
+
+        // Example scoring criteria
+        const importantKeywords = ["AI", "Machine Learning", "Neural Network", "Deep Learning"];
+        importantKeywords.forEach(keyword => {
+            if (anchorText.toLowerCase().includes(keyword.toLowerCase())) {
+                score += 10; // Assign higher score if the anchor text matches important keywords
+            }
+        });
+
+        // Additional scoring criteria based on URL pattern (e.g., blog, research)
+        if (url.toLowerCase().includes("blog")) {
+            score += 5;
+        } else if (url.toLowerCase().includes("research")) {
+            score += 8;
+        }
+
+        return score;
+    }
+
+    // Start the exploration
+    await explore();
+    return { text: texts, images: images, audio: audio };
 }

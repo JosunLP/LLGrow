@@ -39,7 +39,8 @@ export class AdvancedLLM extends BasicLLM {
             this.optimizationHistory.push(`Crawled and learned from ${startUrl} with multi-modal data at ${new Date().toISOString()}`);
             this.saveKnowledge();
         } catch (error) {
-            this.errorDetector.logError(`Error during crawling and learning: ${(error as Error).message}`);
+            const errorMessage = (error as Error).message;
+            this.errorDetector.logError(`Error during crawling and learning: ${errorMessage}`);
         }
     }
 
@@ -61,7 +62,8 @@ export class AdvancedLLM extends BasicLLM {
 
             return response;
         } catch (error) {
-            this.errorDetector.logError(`Error during response generation: ${(error as Error).message}`);
+            const errorMessage = (error as Error).message;
+            this.errorDetector.logError(`Error during response generation: ${errorMessage}`);
             return "Sorry, an error occurred while generating the response.";
         }
     }
@@ -69,11 +71,12 @@ export class AdvancedLLM extends BasicLLM {
     // Update user preferences based on interaction or explicit feedback
     updateUserPreferences(userId: string, preferences: Partial<UserProfile["preferences"]>): void {
         try {
-            const currentPreferences = this.userProfileManager.getUserProfile(userId).preferences;
-            const updatedPreferences = { ...currentPreferences, ...preferences };
+            const existingPreferences = this.userProfileManager.getUserProfile(userId).preferences;
+            const updatedPreferences = { ...existingPreferences, ...preferences };
             this.userProfileManager.updateUserProfile(userId, { preferences: updatedPreferences });
         } catch (error) {
-            this.errorDetector.logError(`Error updating user preferences: ${(error as Error).message}`);
+            const errorMessage = (error as Error).message;
+            this.errorDetector.logError(`Error updating user preferences: ${errorMessage}`);
         }
     }
 
@@ -82,7 +85,7 @@ export class AdvancedLLM extends BasicLLM {
         super.selfOptimize();
         const corrections = this.errorDetector.correctErrors();
 
-        corrections.forEach((correction: string) => {
+        corrections.forEach(correction => {
             this.optimizationHistory.push(`Correction made: ${correction}`);
         });
 
