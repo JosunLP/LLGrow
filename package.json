@@ -1,32 +1,30 @@
+
 {
   "name": "llm_project",
   "version": "1.0.0",
   "main": "dist/index.js",
   "license": "MIT",
   "scripts": {
-    "start": "npm run format && npx ts-node src/index.ts",
-    "format": "prettier --write \"src/**/*.ts\"",
-    "build": "tsc"
+    "start": "npx ts-node src/index.ts",
+    "build": "tsc",
+    "test": "jest --coverage"
   },
   "devDependencies": {
     "@types/cheerio": "^0.22.30",
-    "@types/ffmpeg-static": "^3.0.3",
-    "@types/jsdom": "^21.1.7",
-    "@types/node": "^20.17.6",
-    "prettier": "^3.3.3",
+    "@types/node": "^20.4.2",
+    "@types/jest": "^27.0.1",
     "ts-node": "^10.4.0",
-    "typescript": "^4.4.3"
+    "typescript": "^4.4.3",
+    "jest": "^27.0.6",
+    "ts-jest": "^27.0.4"
   },
   "dependencies": {
-    "@tensorflow/tfjs-node": "^4.22.0",
-    "@types/fluent-ffmpeg": "^2.1.27",
     "axios": "^0.24.0",
     "cheerio": "^1.0.0-rc.10",
-    "ffmpeg-static": "^5.2.0",
-    "fluent-ffmpeg": "^2.1.3",
-    "jsdom": "^25.0.1",
+    "winston": "^3.3.3",
     "sqlite": "^4.0.23",
     "sqlite3": "^5.0.2",
-    "winston": "^3.3.3"
+    "fluent-ffmpeg": "^2.1.2",
+    "ffmpeg-static": "^4.4.0"
   }
 }
