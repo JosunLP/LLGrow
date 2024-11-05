@@ -1,5 +1,5 @@
 
-import { AdvancedLLM } from './llm/AdvancedLLM';
+import { AdvancedLLM } from "./llm/AdvancedLLM";
 
 (async () => {
     const llm = new AdvancedLLM();
@@ -15,7 +15,7 @@ import { AdvancedLLM } from './llm/AdvancedLLM';
 
     // Multi-modal Crawling and Learning with advanced prioritization
     try {
-        await llm.crawlAndLearn('https://example.com');
+        await llm.crawlAndLearn('https://wikipedia.org');
     } catch (error) {
         console.error("Caught an error during crawling and learning:", error);
     }

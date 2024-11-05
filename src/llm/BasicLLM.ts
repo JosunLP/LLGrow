@@ -1,9 +1,9 @@
 
-import { LLM } from './LLM';
-import { crawlAndExplore } from '../utils/crawler';
-import { openDb, initializeDb } from '../utils/database';
-import * as fs from 'fs';
-import * as path from 'path';
+import { LLM } from "./LLM";
+import { crawlAndExplore } from "../utils/crawler";
+import { openDb, initializeDb } from "../utils/database";
+import * as fs from 'node:fs';
+import * as path from 'node:path';
 import { Database } from 'sqlite'; // or the correct module where Database is defined
 
 export class BasicLLM implements LLM {

@@ -1,10 +1,10 @@
 
 import { BasicLLM } from './BasicLLM';
-import { crawlAndExplore } from '../utils/crawler';
-import { processImage } from '../utils/imageProcessor';
-import { processAudio } from '../utils/audioProcessor';
-import { UserProfileManager, UserProfile } from '../utils/userProfile';
-import { ErrorDetector } from '../utils/errorDetection';
+import { crawlAndExplore } from "../utils/crawler";
+import { processImage } from "../utils/imageProcessor";
+import { processAudio } from "../utils/audioProcessor";
+import { UserProfileManager, UserProfile } from "../utils/userProfile";
+import { ErrorDetector } from "../utils/errorDetection";
 
 export class AdvancedLLM extends BasicLLM {
     private optimizationHistory: string[] = [];

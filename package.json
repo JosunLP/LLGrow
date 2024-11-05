@@ -11,7 +11,7 @@
     "@types/cheerio": "^0.22.30",
     "@types/ffmpeg-static": "^3.0.3",
     "@types/jsdom": "^21.1.7",
-    "@types/node": "^20.4.2",
+    "@types/node": "^20.17.6",
     "ts-node": "^10.4.0",
     "typescript": "^4.4.3"
   },
