@@ -18,8 +18,8 @@ export async function crawlAndExplore(startUrl: string): Promise<CrawlResult> {
   const texts: string[] = [];
   const images: string[] = [];
   const audio: string[] = [];
-  const MAX_QUERY = 100;
-  const MAX_ITEMS = 100;
+  const MAX_QUERY = 1000;
+  const MAX_ITEMS = 500;
 
   // Initialize the queue with the start URL and score
   linkQueue.push({ url: startUrl, score: 0 });
@@ -99,7 +99,9 @@ export async function crawlAndExplore(startUrl: string): Promise<CrawlResult> {
       console.log(`Queue size: ${linkQueue.length}`);
       console.log('-----------------------------------');
 
-      // Filter out already visited pages from the queue
+      if (visited.size >= MAX_ITEMS) {
+        break;
+      }
     }
     console.log('Exploration completed');
   }

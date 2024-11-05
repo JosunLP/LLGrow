@@ -14,7 +14,7 @@ import { AdvancedLLM } from './llm/AdvancedLLM';
 
   // Multi-modal Crawling and Learning with advanced prioritization
   try {
-    await llm.crawlAndLearn('https://josunlp.de/');
+    await llm.crawlAndLearn('https://google.de/');
   } catch (error) {
     console.error('Caught an error during crawling and learning:', error);
   }
