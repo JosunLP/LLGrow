@@ -19,6 +19,8 @@ export async function crawlAndExplore(startUrl: string): Promise<CrawlResult> {
     const texts: string[] = [];
     const images: string[] = [];
     const audio: string[] = [];
+    const MAX_QUERY = 1000;
+    const MAX_ITEMS = 1000;
 
     // Initialize the queue with the start URL and score
     linkQueue.push({ url: startUrl, score: 0 });
@@ -42,6 +44,9 @@ export async function crawlAndExplore(startUrl: string): Promise<CrawlResult> {
                 // Text extraction
                 $('body').find('*').each((_, elem) => {
                     if ($(elem).text().trim() !== '') {
+                        if (texts.length >= MAX_ITEMS) {
+                            return;
+                        }
                         texts.push($(elem).text().trim());
                     }
                 });
@@ -50,6 +55,9 @@ export async function crawlAndExplore(startUrl: string): Promise<CrawlResult> {
                 $('img').each((_, elem) => {
                     const imgSrc = $(elem).attr('src');
                     if (imgSrc && !visited.has(imgSrc)) {
+                        if (images.length >= MAX_ITEMS) {
+                            return;
+                        }
                         images.push(imgSrc);
                     }
                 });
@@ -58,6 +66,9 @@ export async function crawlAndExplore(startUrl: string): Promise<CrawlResult> {
                 $('audio, source').each((_, elem) => {
                     const audioSrc = $(elem).attr('src');
                     if (audioSrc && !visited.has(audioSrc)) {
+                        if (audio.length >= MAX_ITEMS) {
+                            return;
+                        }
                         audio.push(audioSrc);
                     }
                 });
@@ -68,6 +79,9 @@ export async function crawlAndExplore(startUrl: string): Promise<CrawlResult> {
                     if (href && !visited.has(href) && href.startsWith('http')) {
                         // Evaluate the link and add it to the queue with a score
                         const score = evaluateLink(href, $(link).text());
+                        if (MAX_QUERY && linkQueue.length >= MAX_QUERY) {
+                            return;
+                        }
                         linkQueue.push({ url: href, score });
                     }
                 });
@@ -75,7 +89,11 @@ export async function crawlAndExplore(startUrl: string): Promise<CrawlResult> {
             } catch (error: any) {
                 console.error(`Error during crawling ${currentLinkData.url}: ${error.message}`);
             }
+            console.log(`Visited ${visited.size} links`);
+            console.log(`Queue size: ${linkQueue.length}`);
+            console.log('-----------------------------------');
         }
+        console.log('Exploration completed');
     }
 
     // Link scoring function to prioritize links
