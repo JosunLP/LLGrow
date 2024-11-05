@@ -6,7 +6,7 @@ import * as path from 'node:path';
 import { Database } from 'sqlite'; // or the correct module where Database is defined
 
 export class BasicLLM implements LLM {
-  private knowledgeBase: string[] = [];
+  protected knowledgeBase: string[] = [];
   protected dataPath: string = path.resolve(__dirname, '../../data');
   private db: Database | null = null;
 
