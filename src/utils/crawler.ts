@@ -71,6 +71,7 @@ export async function crawlAndExplore(startUrl: string): Promise<CrawlResult> {
                         linkQueue.push({ url: href, score });
                     }
                 });
+                console.log(`Crawled ${currentLinkData.url}`);
             } catch (error: any) {
                 console.error(`Error during crawling ${currentLinkData.url}: ${error.message}`);
             }
