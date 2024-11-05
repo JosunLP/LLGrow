@@ -1,51 +1,46 @@
 
 import axios from 'axios';
 import * as cheerio from 'cheerio';
-import * as winston from 'winston';
+import { extractTextFromUrl } from './textProcessor';
+import { processImage } from './imageProcessor';
+import { processAudio } from './audioProcessor';
 
-// Logger Konfiguration
-const logger = winston.createLogger({
-    level: 'info',
-    format: winston.format.json(),
-    transports: [
-        new winston.transports.Console(),
-        new winston.transports.File({ filename: 'log/error.log', level: 'error' }),
-        new winston.transports.File({ filename: 'log/combined.log' })
-    ]
-});
-
-async function extractTextFromUrl(url: string): Promise<string[]> {
-    try {
-        const response = await axios.get(url);
-        const $ = cheerio.load(response.data);
-        const texts: string[] = [];
-        $('body').find('*').each((i, elem) => {
-            if ($(elem).text().trim() !== '') {
-                texts.push($(elem).text().trim());
-            }
-        });
-        return texts;
-    } catch (error) {
-        logger.error(`Error during extracting text from ${url}: ${(error as Error).message}`);
-        throw error;
-    }
-}
-
-export async function crawlAndExplore(startUrl: string): Promise<string[]> {
+export async function crawlAndExplore(startUrl: string): Promise<{ text: string[], images: string[], audio: string[] }> {
     const visited = new Set<string>();
     const texts: string[] = [];
+    const images: string[] = [];
+    const audio: string[] = [];
 
     async function explore(url: string, depth: number = 0): Promise<void> {
-        if (visited.has(url) || depth > 2) return; // Limit depth to prevent deep recursion
+        if (visited.has(url) || depth > 2) return;
         visited.add(url);
 
         try {
             const response = await axios.get(url);
             const $ = cheerio.load(response.data);
-            texts.push(...await extractTextFromUrl(url));
 
+            // Text extraction
+            texts.push(...extractTextFromUrl($));
+
+            // Image extraction
+            $('img').each((_, elem) => {
+                const imgSrc = $(elem).attr('src');
+                if (imgSrc && !visited.has(imgSrc)) {
+                    images.push(imgSrc);
+                }
+            });
+
+            // Audio extraction
+            $('audio, source').each((_, elem) => {
+                const audioSrc = $(elem).attr('src');
+                if (audioSrc && !visited.has(audioSrc)) {
+                    audio.push(audioSrc);
+                }
+            });
+
+            // Link extraction for crawling
             const links = $('a[href]')
-                .map((i, link) => $(link).attr('href'))
+                .map((_, link) => $(link).attr('href'))
                 .get()
                 .filter(href => href && !visited.has(href) && href.startsWith('http'));
 
@@ -53,10 +48,14 @@ export async function crawlAndExplore(startUrl: string): Promise<string[]> {
                 await explore(link, depth + 1);
             }
         } catch (error) {
-            console.error(`Error during crawling ${url}: ${(error as Error).message}`);
+            if (error instanceof Error) {
+                console.error(`Error during crawling ${url}: ${error.message}`);
+            } else {
+                console.error(`Error during crawling ${url}: ${String(error)}`);
+            }
         }
     }
 
     await explore(startUrl);
-    return texts;
+    return { text: texts, images, audio };
 }

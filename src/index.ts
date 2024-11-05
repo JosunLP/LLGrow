@@ -1,23 +1,15 @@
-import { AdvancedLLM } from "./llm/AdvancedLLM";
-import { JSDOM } from "jsdom";
 
-const { window } = new JSDOM();
-const { document } = window;
+import { AdvancedLLM } from './llm/AdvancedLLM';
 
 (async () => {
-  const llm = new AdvancedLLM();
-  await llm.initDb();
-  llm.train("Initial training data");
-  console.log(llm.generate("What is the meaning of life?"));
-  llm.selfOptimize();
-  console.log(llm.generate("What is the meaning of life?"));
+    const llm = new AdvancedLLM();
+    llm.train('Initial training data');
+    console.log(llm.generate('What is the meaning of life?'));
 
-  // Crawling and learning from a website
-  await llm.crawlAndLearn("https://example.com");
-  console.log(llm.generate("What is the meaning of life?"));
+    // Multi-modal Crawling and Learning
+    await llm.crawlAndLearn('https://example.com');
+    console.log(llm.generate('Summarize the learned data'));
 
-  // Developing new functions
-  llm.developNewFunctions();
-  console.log(llm.generate("What is the meaning of life?"));
-
+    // Output for verification
+    console.log(llm.generate('What are key takeaways from this session?'));
 })();

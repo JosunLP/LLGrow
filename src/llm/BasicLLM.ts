@@ -41,7 +41,7 @@ export class BasicLLM implements LLM {
   async crawlAndLearn(startUrl: string): Promise<void> {
     try {
       const texts = await crawlAndExplore(startUrl);
-      texts.forEach((text) => this.train(text));
+      texts.text.forEach((text) => this.train(text));
       this.saveKnowledge();
     } catch (error) {
       console.error(`Failed to crawl ${startUrl}:`, error);

@@ -1,52 +1,31 @@
 
 import { BasicLLM } from './BasicLLM';
-import fs from 'fs';
-import path from 'path';
+import { crawlAndExplore } from '../utils/crawler';
+import { processImage } from '../utils/imageProcessor';
+import { processAudio } from '../utils/audioProcessor';
 
 export class AdvancedLLM extends BasicLLM {
     private optimizationHistory: string[] = [];
 
-    selfOptimize(): void {
-        super.selfOptimize();
-        this.optimizationHistory.push(`Optimization performed at ${new Date().toISOString()}`);
-        this.saveKnowledge();
-    }
-
-    generate(prompt: string): string {
-        const baseResponse = super.generate(prompt);
-        if (this.optimizationHistory.length > 0) {
-            return `Advanced Response: ${baseResponse} (optimized at ${this.optimizationHistory.slice(-1)[0]})`;
-        } else {
-            return `Advanced Response: ${baseResponse}`;
-        }
-    }
-
     async crawlAndLearn(startUrl: string): Promise<void> {
-        await super.crawlAndLearn(startUrl);
-        this.optimizationHistory.push(`Crawled and learned from ${startUrl} at ${new Date().toISOString()}`);
-        this.saveKnowledge();
-    }
+        const { text, images, audio } = await crawlAndExplore(startUrl);
 
-    developNewFunctions(): void {
-        super.developNewFunctions();
-        this.optimizationHistory.push(`Developed new function at ${new Date().toISOString()}`);
-        this.saveKnowledge();
-    }
+        // Train with text data
+        text.forEach(t => this.train(t));
 
-    saveKnowledge(): void {
-        super.saveKnowledge();
-        fs.writeFileSync(
-            path.join(this.dataPath, 'optimizationHistory.json'),
-            JSON.stringify(this.optimizationHistory)
-        );
-    }
-
-    loadKnowledge(): void {
-        super.loadKnowledge();
-        const filePath = path.join(this.dataPath, 'optimizationHistory.json');
-        if (fs.existsSync(filePath)) {
-            const data = fs.readFileSync(filePath, 'utf-8');
-            this.optimizationHistory = JSON.parse(data);
+        // Process and train with image data
+        for (const imgUrl of images) {
+            const imageData = await processImage(imgUrl);
+            this.train(imageData);
         }
+
+        // Process and train with audio data
+        for (const audioUrl of audio) {
+            const audioData = await processAudio(audioUrl);
+            this.train(audioData);
+        }
+
+        this.optimizationHistory.push(`Crawled and learned from ${startUrl} with multi-modal data at ${new Date().toISOString()}`);
+        this.saveKnowledge();
     }
 }
