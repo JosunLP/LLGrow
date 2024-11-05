@@ -36,6 +36,6 @@ Vorteil: Fördert verantwortungsbewusste AI-Entwicklung und schützt vor diskrim
 Beschreibung: Implementiere die Möglichkeit, externe APIs zu integrieren, um Echtzeitdaten zu verwenden (z. B. Wetterdaten, Nachrichten).
 Vorteil: Erhöht die Relevanz der Informationen, die das LLM generiert.
 
-10. Community-gestützte Wissensdatenbank
-Beschreibung: Entwickle eine Plattform, auf der Benutzer Wissen und Daten beitragen können, die das LLM nutzen kann.
-Vorteil: Fördert eine dynamische und sich ständig erweiternde Wissensbasis, die von der Community unterstützt wird.
+10. Konfiguration über config json file
+Beschreibung: Füge die Möglichkeit hinzu, das Verhalten des LLM über ein Konfigurations-JSON-Datei anzupassen.
+Vorteil: Ermöglicht eine einfache Anpassung und Konfiguration des Modells ohne direkte Codeänderungen.
