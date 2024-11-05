@@ -4,7 +4,7 @@ import sqlite3 from 'sqlite3';
 
 export async function openDb(): Promise<Database> {
     return open({
-        filename: './data/knowledge.db',
+        filename: './data/knowledge.db', // Ensure this path is correct and the directory exists
         driver: sqlite3.Database
     });
 }
